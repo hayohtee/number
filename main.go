@@ -4,13 +4,34 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
+	"sync"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/classify-number")
+	mux.HandleFunc("GET /api/classify-number", numberHandler)
 }
+
+func numberHandler(w http.ResponseWriter, r *http.Request) {
+	numberParam := r.URL.Query().Get("number")
+	if numberParam == "" {
+		badRequestResponse(w, numberParam)
+		return
+	}
+
+	number, err := strconv.Atoi(numberParam)
+	if err != nil {
+		badRequestResponse(w, numberParam)
+	}
+
+	var wg sync.WaitGroup
+
+	
+}
+
+
 
 // badRequestResponse sends a JSON response with a bad request status code.
 // The response includes the provided number and an error flag.
