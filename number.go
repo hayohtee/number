@@ -39,43 +39,40 @@ func isPerfect(value int) bool {
 	return sum == value
 }
 
-// isPrime checks if a given integer is a prime number.
-// It returns true if the number is prime, and false otherwise.
-//
-// A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself.
-//
-// The function first handles simple cases where the number is less than or equal to 3.
-// For numbers greater than 3, it checks divisibility by 2 and 3.
-// Then, it uses a loop to check for factors up to the square root of the number, skipping even numbers.
+// isPrime determines if a given integer is a prime number and sends the result to the provided channel.
 //
 // Parameters:
-//   - value: the integer to be checked for.
+//   - value: The integer to be checked for.
+//   - resultChan: A channel to send the boolean result indicating whether the number is prime or not.
 //
-// Returns:
-//   - bool: true if the number is prime, false otherwise.
-func isPrime(value int) bool {
+// The function first handles edge cases for numbers less than or equal to 3.
+// It then checks divisibility by 2 and 3.
+// For larger numbers, it uses a loop to check divisibility by numbers of the form 6k ± 1 up to the square root of the value.
+func isPrime(value int, resultChan chan<- bool) {
 	if value <= 1 {
-		return false
+		resultChan <- false
+		return
 	}
 
 	if value <= 3 {
-		return true
+		resultChan <- true
+		return
 	}
 
 	if value%2 == 0 || value%3 == 0 {
-		return false
+		resultChan <- false
+		return
 	}
 
 	sqrt := int(math.Sqrt(float64(value)))
 
 	for i := 5; i <= sqrt; i += 6 {
 		if value%i == 0 || value%(i+2) == 0 {
-			return false
+			resultChan <- false
 		}
 	}
-	return true
+	resultChan <- true
 }
-
 
 // isArmstrong checks if a given integer is an Armstrong number.
 // An Armstrong number (also known as a narcissistic number) is a number that is equal to the sum of its own digits each raised to the power of the number of digits.
