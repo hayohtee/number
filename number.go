@@ -2,10 +2,9 @@ package main
 
 import "math"
 
-// isPerfectNumber checks if a given integer is a perfect number.
-// A perfect number is a positive integer that is equal to the sum of its proper divisors,
-// excluding the number itself. For example, 6 is a perfect number because its proper divisors
-// are 1, 2, and 3, and 1 + 2 + 3 = 6.
+// isPerfect checks if a given integer is a perfect number.
+// A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
+// For example, 6 is a perfect number because its divisors are 1, 2, and 3, and 1 + 2 + 3 = 6.
 //
 // Parameters:
 //
@@ -14,21 +13,23 @@ import "math"
 // Returns:
 //
 //	bool: True if the integer is a perfect number, false otherwise.
-func isPerfectNumber(value int) bool {
-	// Check for non-positive integers
-	if value <= 0 {
+func isPerfect(value int) bool {
+	if value <= 1 {
 		return false
 	}
 
-	sumDivisors := 0
+	sum := 1
 
-	for i := 1; i < value; i++ {
+	for i := 2; i*i <= value; i++ {
 		if value%i == 0 {
-			sumDivisors += i
+			sum += i
+			if i != value/i {
+				sum += value / i
+			}
 		}
 	}
 
-	return sumDivisors == value
+	return sum == value
 }
 
 // isPrime checks if a given integer is a prime number.
