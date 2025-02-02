@@ -42,7 +42,7 @@ func isPerfect(value int) bool {
 // Then, it uses a loop to check for factors up to the square root of the number, skipping even numbers.
 //
 // Parameters:
-//   - value: the integer to be checked for primality.
+//   - value: the integer to be checked for.
 //
 // Returns:
 //   - bool: true if the number is prime, false otherwise.
