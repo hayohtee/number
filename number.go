@@ -1,6 +1,13 @@
 package main
 
-import "math"
+import (
+	"context"
+	"fmt"
+	"io"
+	"math"
+	"net/http"
+	"time"
+)
 
 // isPerfect checks if a given integer is a perfect number.
 // A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
@@ -74,10 +81,12 @@ func isPrime(value int) bool {
 // For example, 153 is an Armstrong number because 1^3 + 5^3 + 3^3 = 153.
 //
 // Parameters:
-//   value (int): The integer to check.
+//
+//	value (int): The integer to check.
 //
 // Returns:
-//   bool: True if the number is an Armstrong number, false otherwise.
+//
+//	bool: True if the number is an Armstrong number, false otherwise.
 func isArmstrong(value int) bool {
 	if value < 0 {
 		return false
@@ -100,4 +109,36 @@ func isArmstrong(value int) bool {
 	}
 
 	return sum == value
+}
+
+// getFunFact fetches a fun fact about a given number from the Numbers API.
+// It takes an integer value as input and returns a string containing the fun fact
+// or an error if the request fails or the context times out.
+//
+// The function creates a context with a timeout of 1 second to ensure the request
+// does not hang indefinitely. It then constructs an HTTP GET request to the Numbers API
+// using the provided number. If the request is successful, it reads the response body
+// and returns it as a string. If any error occurs during the process, it returns an empty
+// string and the error.
+func getFunFact(value int) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://numbersapi.com/%d", value), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
 }
