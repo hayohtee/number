@@ -76,20 +76,20 @@ func isPrime(value int) bool {
 	return true
 }
 
+
 // isArmstrong checks if a given integer is an Armstrong number.
 // An Armstrong number (also known as a narcissistic number) is a number that is equal to the sum of its own digits each raised to the power of the number of digits.
 // For example, 153 is an Armstrong number because 1^3 + 5^3 + 3^3 = 153.
 //
 // Parameters:
+//   - value: The integer to be checked.
+//   - resultChan: A channel to send the result (true if the number is an Armstrong number, false otherwise).
 //
-//	value (int): The integer to check.
-//
-// Returns:
-//
-//	bool: True if the number is an Armstrong number, false otherwise.
-func isArmstrong(value int) bool {
+// The function sends the result to the provided resultChan channel.
+func isArmstrong(value int, resultChan chan<- bool) {
 	if value < 0 {
-		return false
+		resultChan <- false
+		return
 	}
 
 	temp := value
@@ -108,7 +108,7 @@ func isArmstrong(value int) bool {
 		temp /= 10
 	}
 
-	return sum == value
+	resultChan <- sum == value
 }
 
 // getFunFact fetches a fun fact about a given number from the Numbers API.
