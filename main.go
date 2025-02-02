@@ -4,13 +4,29 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/classify-number", numberHandler)
+
+	srv := http.Server{
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Handler:      mux,
+		Addr:         ":4000",
+	}
+
+	slog.Info("starting server", "addr", "4000")
+
+	if err := srv.ListenAndServe(); err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
 }
 
 func numberHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +39,7 @@ func numberHandler(w http.ResponseWriter, r *http.Request) {
 	number, err := strconv.Atoi(numberParam)
 	if err != nil {
 		badRequestResponse(w, numberParam)
+		return
 	}
 
 	isPrimeChan := make(chan bool)
@@ -70,7 +87,7 @@ func numberHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(http.StatusOK)
 	w.Write(js)
 }
 
