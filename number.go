@@ -11,18 +11,15 @@ import (
 
 // isPerfect checks if a given integer is a perfect number.
 // A perfect number is a positive integer that is equal to the sum of its proper divisors, excluding itself.
-// For example, 6 is a perfect number because its divisors are 1, 2, and 3, and 1 + 2 + 3 = 6.
+// The result is sent to the provided result channel.
 //
 // Parameters:
-//
-//	value (int): The integer to check.
-//
-// Returns:
-//
-//	bool: True if the integer is a perfect number, false otherwise.
-func isPerfect(value int) bool {
+//   - value: The integer to be checked.
+//   - resultChan: A channel to send the result (true if the number is perfect, false otherwise).
+func isPerfect(value int, resultChan chan<- bool) {
 	if value <= 1 {
-		return false
+		resultChan <- false
+		return
 	}
 
 	sum := 1
@@ -36,7 +33,7 @@ func isPerfect(value int) bool {
 		}
 	}
 
-	return sum == value
+	resultChan <- sum == value
 }
 
 // isPrime determines if a given integer is a prime number and sends the result to the provided channel.
