@@ -136,3 +136,25 @@ func getFunFact(value int) (string, error) {
 
 	return string(body), nil
 }
+
+// digitSum calculates the sum of the digits of the given integer value.
+// It handles negative numbers by converting them to their absolute value.
+// The result is sent to the provided resultChan channel.
+//
+// Parameters:
+//   - value: The integer whose digits are to be summed.
+//   - resultChan: A channel to send the resulting sum of the digits.
+func digitSum(value int, resultChan chan<- int) {
+	sum := 0
+
+	// Handle negative number
+	value = int(math.Abs(float64(value)))
+
+	for value > 0 {
+		digit := value % 10
+		sum += digit
+		value /= 10
+	}
+
+	resultChan <- sum
+}
