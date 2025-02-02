@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
-	"sync"
 )
 
 func main() {
@@ -26,12 +25,54 @@ func numberHandler(w http.ResponseWriter, r *http.Request) {
 		badRequestResponse(w, numberParam)
 	}
 
-	var wg sync.WaitGroup
+	isPrimeChan := make(chan bool)
+	isPerfectChan := make(chan bool)
+	isArmstrongChan := make(chan bool)
+	digitSumChan := make(chan int)
 
-	
+	go isArmstrong(number, isArmstrongChan)
+	go isPerfect(number, isPerfectChan)
+	go isPrime(number, isPrimeChan)
+	go digitSum(number, digitSumChan)
+
+	fact, err := getFunFact(number)
+	if err != nil {
+		http.Error(w, "the server encountered a problem when processing the request", http.StatusInternalServerError)
+		return
+	}
+
+	var properties []string
+
+	if <-isArmstrongChan {
+		properties = append(properties, "armstrong")
+	}
+
+	if number%2 == 0 {
+		properties = append(properties, "even")
+	} else {
+		properties = append(properties, "odd")
+	}
+
+	resp := map[string]any{
+		"number":     number,
+		"is_prime":   <-isPrimeChan,
+		"is_perfect": <-isPerfectChan,
+		"properties": properties,
+		"digit_sum":  <-digitSumChan,
+		"fun_fact":   fact,
+	}
+
+	js, err := json.MarshalIndent(resp, "", "\t")
+	if err != nil {
+		slog.Error(err.Error())
+		http.Error(w, "the server encountered a problem when processing the request", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write(js)
 }
-
-
 
 // badRequestResponse sends a JSON response with a bad request status code.
 // The response includes the provided number and an error flag.
